@@ -1,0 +1,10 @@
+/src
+/coverage
+/test
+/node_modules
+
+.DS_Store
+tsconfig.json
+tsdown.config.ts
+vitest.config.ts
+.gitignore
