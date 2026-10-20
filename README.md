@@ -2,7 +2,6 @@
 
 ![Logo](/doc/app-context-kit.png)
 
-A lightweight tool that helps you compose modular applications in a type-safe way.
 
 ## When to use it
 - When you want to combine multiple modules into a single, unified application.
@@ -56,6 +55,53 @@ class IdentityDescription implements ContextDescription {
         // if the context is not required in the application, this object will be called
     }
 }
+```
+
+```ts
+    // include all contexts that are available in the application
+    const descriptions = [
+        new IdentityDescription(dependency),
+        new NotificationDescription(dependency)
+    ] satisfies readonly ContextDescription[]
+
+
+    const kit = new ContextKit<typeof descriptions>(
+        descriptions,
+        {
+            // determine which context will be used inside the kit
+            // if "inUseContexts" is undefined, the kit will use all contexts
+            inUseContexts: ["identity", "notification"],
+            setup: async () => {
+                // setup scope
+                // for example, create a new unit of work for the scope
+                // return a new dependency container
+            },
+            teardown: async (container: ScopeContainer) => {
+                // teardown scope
+                // for example, commit all changes inside the unit of work
+            },
+            // option to wrap the "Missing Context" error with a custom error at the kit level
+            // each time the "Missing Context" error should be thrown, the custom error will be thrown instead
+            missingContextErrorWrapper: (error: MissingContext) => {
+                // return customer error
+            }
+        }
+    )
+
+    // somewhere in the application
+    // in some HTTP controller
+    await kit.runScope(async contexts => {
+        await contexts.identity.createUser(id, name, email)
+        await contexts.notification.sendEmail(email, "WELCOME_TEMPLATE")
+    }, {
+        // determine which contexts are required for the run
+        // if required context is missing, a "MissingContext" error will be thrown 
+        requiredContexts: ["identity"],
+        // option to wrap the "Missing Context" error with a custom error only for the run
+        missingContextErrorWrapper: (error: MissingContext) => {
+            // return customer error
+        }
+    })
 ```
 
 ## License
