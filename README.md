@@ -1,5 +1,7 @@
 # app-context-kit
 
+![Logo](/doc/app-context-kit.png)
+
 A lightweight tool that helps you compose modular applications in a type-safe way.
 
 ## When to use it
